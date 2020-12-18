@@ -46,7 +46,6 @@ int GradConj(int n, Linha * matrizEsparsa, double* b, double* x, double tol) {
         if(normadois < tol) {
             return k;
         }
-        //multmv(n,n,A,d,Adk);
         multiplicaMatrizEsparsaPorVetor(n,matrizEsparsa,dk0,Adk);
         rr = prodescalar(n,rk0,rk0);
         alpha =  rr / prodescalar(n,dk0,Adk); 
@@ -63,7 +62,7 @@ int GradConj(int n, Linha * matrizEsparsa, double* b, double* x, double tol) {
     }
     return k;
 }
-int GradConjPreCondGaussSeidel(int n, Linha * matrizEsparsa, double* b, double* x, double tol) {
+int GradConjPreCond(int n, Linha * matrizEsparsa, double* b, double* x, double tol, double w) {
     int k; 
     double alpha;
     double beta;
@@ -82,13 +81,12 @@ int GradConjPreCondGaussSeidel(int n, Linha * matrizEsparsa, double* b, double* 
     double* zk1 = criavet(n);
     double* xn = criavet(n);
     printf("Iniciando geração do Precondicionador\n");
-    Linha * M = criaPreCond(n,matrizEsparsa);
+    Linha * M = criaPreCond(n,matrizEsparsa,w);
     printf("Gerou o Precondicionador\n");
     multiplicaMatrizEsparsaPorVetor(n,matrizEsparsa,x,Ax);
     printf("Multiplicou Matriz Esparsa por Vetor\n");
 
     subtraivet(n,b,Ax,rk0);
-    //imprimeMatrizEsparsa(n,M);  
     GradConj(n,M,rk0,zk0,tol);
     clonavet(n,zk0,dk0);
     for(k = 0; k< n; k++) {
@@ -96,7 +94,6 @@ int GradConjPreCondGaussSeidel(int n, Linha * matrizEsparsa, double* b, double* 
         if(normadois < tol) {
             return k;
         }
-        //multmv(n,n,A,d,Adk);
         multiplicaMatrizEsparsaPorVetor(n,matrizEsparsa,dk0,Adk);
         rz = prodescalar(n,rk0,zk0);
         alpha =  rz / prodescalar(n,dk0,Adk); 
@@ -104,7 +101,6 @@ int GradConjPreCondGaussSeidel(int n, Linha * matrizEsparsa, double* b, double* 
         multvs(n,Adk,alpha,alphaAdk);
         somavet(n,x,alphaDk,xn);
         subtraivet(n,rk0,alphaAdk,rk1);
-        //multiplicaPreCondPorVetor(n,matrizEsparsa, 1.0, rk1, zk1);
         GradConj(n,M,rk1,zk1,tol);
         beta = prodescalar(n,rk1,zk1) / prodescalar(n,rk0,zk0);
         multvs(n,dk0,beta,betaDk);
@@ -116,43 +112,4 @@ int GradConjPreCondGaussSeidel(int n, Linha * matrizEsparsa, double* b, double* 
     }
     return k;
 }
-// int GradConjPreCond (int n, double** A, double* b, double* x, double tol) {
-//     int k; 
-//     double alpha;
-//     double beta;
-//     double rz;
-//     double normadois;
-//     double* betaDk = criavet(n);
-//     double* alphaDk = criavet(n);
-//     double* alphaAdk = criavet(n);
-//     double* Adk = criavet(n);
-//     double* Ax = criavet(n);
-//     double* r = criavet(n);
-//     double* d = criavet(n);
-//     double* z = criavet(n);
-//     multiplicaMatrizEsparsaPorVetor(n,4,matrizEsparsa,x,Ax);
-//     //multmv(n,n,A,x,Ax);
-//     subtraivet(n,b,Ax,r);
-//     multmv(n,n,Minversa,r,d);
-//     z = d;
-//     for(k = 0; k< n; k++) {
-//         normadois = norma2(n,r);
-//         if(normadois < tol) {
-//             return k;
-//         }
-//         multmv(n,n,A,d,Adk);
-//         rz = prodescalar(n,r,z);
-//         alpha =  rz / (1+prodescalar(n,d,Adk)); 
-//         multvs(n,d,alpha,alphaDk);
-//         multvs(n,Adk,alpha,alphaAdk);
-//         somavet(n,x,alphaDk,x);
-//         subtraivet(n,r,alphaAdk,r);
-//         multmv(n,n,Minversa,r,z);
-//         beta = prodescalar(n,r,z) / (1+rz);
-//         multvs(n,d,beta,betaDk);
-//         somavet(n,z,betaDk,d);
-
-//     } 
-//    return k;
-//}
 

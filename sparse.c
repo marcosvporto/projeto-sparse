@@ -50,10 +50,6 @@ void insereElementoNaMatrizEsparsa(int linha, int coluna, double valor, Linha * 
         free(aux);
         matrizEsparsa[linha].numeroDeElementos = 1+elementosLinha;
     }
-    // printf("Numero de elementos %d\n",matrizEsparsa[linha].numeroDeElementos);
-    // printf("Inserido valor %.2f\n", matrizEsparsa[linha].elementos[0].valor);
-    // printf("Na coluna %d\n", matrizEsparsa[linha].elementos[0].coluna);
-    // printf("Na linha %d\n", linha);
 }
 
 void imprimeMatrizEsparsa(int n, Linha * matrizEsparsa){
@@ -86,7 +82,7 @@ void imprimeMatrizEsparsaNaoSimetrica(int n, Linha * matrizEsparsa){
     }
 }
 
-Linha * criaPreCond(int n,Linha * matrizEsparsa){
+Linha * criaPreCond(int n,Linha * matrizEsparsa, double w){
     int elementoPorLinhaI;
     int elementoPorLinhaJ;
     int elementoPorLinhaDwLDinv;
@@ -104,6 +100,9 @@ Linha * criaPreCond(int n,Linha * matrizEsparsa){
                     elementoPorLinhaI = matrizEsparsa[i].numeroDeElementos;
                     elementoPorLinhaJ = matrizEsparsa[j].numeroDeElementos;
                     Aij = buscaBinariaElementoLinha(i,elementoPorLinhaJ,matrizEsparsa[j].elementos);
+                    if(i != j) {
+                        Aij = Aij*w;
+                    }
                     if(Aij != 0) {
                         Bjk = buscaBinariaElementoLinha(j,elementoPorLinhaI,matrizEsparsa[j].elementos);
                         if(Bjk != 0) {
@@ -118,10 +117,7 @@ Linha * criaPreCond(int n,Linha * matrizEsparsa){
         }
     }
     printf("Gerou o D+wLDinv\n");
-    //imprimeMatrizEsparsaNaoSimetrica(n,matrizDwLDinv);
-    // printf("*****\n");
-    // imprimeMatrizEsparsaNaoSimetrica(n,matrizEsparsa);
-    // printf("*****\n");
+    
 
     for(int i = 0; i<n;i++){
         for(int k=0;k<n;k++){
@@ -134,6 +130,9 @@ Linha * criaPreCond(int n,Linha * matrizEsparsa){
                 elementoPorLinhaDU = matrizEsparsa[j].numeroDeElementos;
                 Aij = matrizDwLDinv[i].elementos[y].valor;
                 Bjk = buscaBinariaElementoLinha(k,elementoPorLinhaDU,matrizEsparsa[j].elementos);
+                if(j != k){
+                    Bjk = w*Bjk;
+                }
                 valor += Aij*Bjk;
             }
             

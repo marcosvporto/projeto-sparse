@@ -3,8 +3,9 @@
 #include"sparse.h"
 #include"gradconj.h"
 
-#define N 10000
+#define N 1000
 #define TOL 0.0000001
+#define W 0
 void imprimeVetor(double *v, int n){
     for(int i =0; i< n; i++) {
         printf("|%.6f|\n", *(v+i));
@@ -29,15 +30,14 @@ int main(){
             }
         }
     }
-    //imprimeMatrizEsparsa(N, matriz);
     multiplicaMatrizEsparsaPorVetor(N,matriz,xe,b);
     int tentativas = GradConj(N,matriz,b,x,TOL);
     printf("%d tentativas\n", tentativas);
+    multiplicaMatrizEsparsaPorVetor(N,matriz,xe,b);
     for(int i = 0; i < N ; i++){
         x[i] = 0.0;
     }
-    tentativas = GradConjPreCondGaussSeidel(N,matriz,b,x,TOL);
+    tentativas = GradConjPreCond(N,matriz,b,x,TOL,W);
     printf("%d tentativas\n", tentativas);
-    imprimeVetor(x,N);
     return 0;
 }
