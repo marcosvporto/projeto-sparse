@@ -85,6 +85,7 @@ void imprimeMatrizEsparsaNaoSimetrica(int n, Linha * matrizEsparsa){
         printf("|\n");
     }
 }
+
 Linha * criaPreCond(int n,Linha * matrizEsparsa){
     int elementoPorLinhaI;
     int elementoPorLinhaJ;
@@ -95,34 +96,50 @@ Linha * criaPreCond(int n,Linha * matrizEsparsa){
     Linha * M = criaMatrizEsparsa(n);
     for(int i = 0; i<n;i++){
         for(int k=0;k<n;k++){
-             valor = 0;
-                for(int j = 0; j< n; j++){
-                    if (j==k){
-                        elementoPorLinhaI = matrizEsparsa[i].numeroDeElementos;
-                        elementoPorLinhaJ = matrizEsparsa[j].numeroDeElementos;
-                        valor += /*A[i][j]*/ buscaBinariaElementoLinha(i,elementoPorLinhaJ,matrizEsparsa[j].elementos) * 
-                                 /*B[j][k]*/ (1.0/buscaBinariaElementoLinha(k,elementoPorLinhaI,matrizEsparsa[j].elementos));
+            valor = 0;
+            for(int j = 0; j< n; j++){
+                if (j==k){
+                    double Aij;
+                    double Bjk;
+                    elementoPorLinhaI = matrizEsparsa[i].numeroDeElementos;
+                    elementoPorLinhaJ = matrizEsparsa[j].numeroDeElementos;
+                    Aij = buscaBinariaElementoLinha(i,elementoPorLinhaJ,matrizEsparsa[j].elementos);
+                    if(Aij != 0) {
+                        Bjk = buscaBinariaElementoLinha(j,elementoPorLinhaI,matrizEsparsa[j].elementos);
+                        if(Bjk != 0) {
+                            valor += Aij * (1.0/Bjk);
+                        }
                     }
                 }
-            insereElementoNaMatrizEsparsa(i,k,valor,matrizDwLDinv);
+            }
+            if(valor != 0){
+                insereElementoNaMatrizEsparsa(i,k,valor,matrizDwLDinv);
+            }
         }
     }
-    // imprimeMatrizEsparsaNaoSimetrica(n,matrizDwLDinv);
+    printf("Gerou o D+wLDinv\n");
+    //imprimeMatrizEsparsaNaoSimetrica(n,matrizDwLDinv);
     // printf("*****\n");
     // imprimeMatrizEsparsaNaoSimetrica(n,matrizEsparsa);
     // printf("*****\n");
 
     for(int i = 0; i<n;i++){
         for(int k=0;k<n;k++){
-             valor = 0;
-                for(int j = 0; j< n; j++){
-                    elementoPorLinhaDwLDinv = matrizDwLDinv[i].numeroDeElementos;
-                    elementoPorLinhaDU = matrizEsparsa[j].numeroDeElementos;
-                    valor += /*A[i][j]*/buscaBinariaElementoLinha(j,elementoPorLinhaDwLDinv,matrizDwLDinv[i].elementos) * 
-                            /*B[j][k]*/buscaBinariaElementoLinha(k,elementoPorLinhaDU,matrizEsparsa[j].elementos);
-                    
-                }
-            insereElementoNaMatrizEsparsa(i,k,valor,M);
+            valor = 0;
+            elementoPorLinhaDwLDinv = matrizDwLDinv[i].numeroDeElementos;
+            double Aij;
+            double Bjk;
+            for(int y = 0; y < elementoPorLinhaDwLDinv; y++){
+                int j = matrizDwLDinv[i].elementos[y].coluna;
+                elementoPorLinhaDU = matrizEsparsa[j].numeroDeElementos;
+                Aij = matrizDwLDinv[i].elementos[y].valor;
+                Bjk = buscaBinariaElementoLinha(k,elementoPorLinhaDU,matrizEsparsa[j].elementos);
+                valor += Aij*Bjk;
+            }
+            
+            if(valor != 0){
+                insereElementoNaMatrizEsparsa(i,k,valor,M);
+            }
         }
     }
     return M;

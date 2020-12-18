@@ -81,10 +81,14 @@ int GradConjPreCondGaussSeidel(int n, Linha * matrizEsparsa, double* b, double* 
     double* zk0 = criavet(n);
     double* zk1 = criavet(n);
     double* xn = criavet(n);
+    printf("Iniciando geração do Precondicionador\n");
     Linha * M = criaPreCond(n,matrizEsparsa);
+    printf("Gerou o Precondicionador\n");
     multiplicaMatrizEsparsaPorVetor(n,matrizEsparsa,x,Ax);
+    printf("Multiplicou Matriz Esparsa por Vetor\n");
+
     subtraivet(n,b,Ax,rk0);
-    imprimeMatrizEsparsa(n,M);    
+    //imprimeMatrizEsparsa(n,M);  
     GradConj(n,M,rk0,zk0,tol);
     clonavet(n,zk0,dk0);
     for(k = 0; k< n; k++) {
